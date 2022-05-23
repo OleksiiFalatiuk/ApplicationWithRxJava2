@@ -4,6 +4,6 @@ import com.example.testapplicationwithrxjava2.models.CryptoMain
 
 interface RemoteDataSource {
 
-    suspend fun loadCrypto(): CryptoMain
+    suspend fun loadCrypto(): List<CryptoMain>
 
 }

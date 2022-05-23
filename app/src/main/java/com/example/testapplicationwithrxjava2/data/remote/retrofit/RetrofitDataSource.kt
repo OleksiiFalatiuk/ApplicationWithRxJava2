@@ -5,14 +5,16 @@ import com.example.testapplicationwithrxjava2.models.CryptoMain
 
 class RetrofitDataSource(private val api: CryptoApiService): RemoteDataSource {
 
-    override suspend fun loadCrypto(): CryptoMain {
+    override suspend fun loadCrypto(): List<CryptoMain> {
         val crypto = api.getCurrenciesTicker()
-        return CryptoMain(
-            id = crypto.id,
-            name = crypto.name,
-            rank = crypto.rank,
-            price = crypto.price,
-            logo_url = crypto.logo_url
-        )
+        return crypto.map {
+            CryptoMain(
+                id = it.id,
+                logo_url = it.logo_url,
+                name = it.name,
+                rank = it.rank,
+                price = it.price
+            )
+        }
     }
 }

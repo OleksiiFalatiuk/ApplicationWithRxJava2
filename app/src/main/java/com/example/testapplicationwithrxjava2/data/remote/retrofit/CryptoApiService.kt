@@ -5,6 +5,6 @@ import retrofit2.http.GET
 
 interface CryptoApiService {
 
-    @GET("/currencies/ticker")
-    suspend fun getCurrenciesTicker(): CryptoItemResponse
+    @GET("currencies/ticker")
+    suspend fun getCurrenciesTicker(): List<CryptoItemResponse>
 }

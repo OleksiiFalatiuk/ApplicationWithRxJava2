@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.testapplicationwithrxjava2.R
 import com.example.testapplicationwithrxjava2.databinding.FragmentCryptoMainBinding
 import com.example.testapplicationwithrxjava2.models.CryptoMain
-import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CryptoMainFragment : Fragment() {
@@ -21,6 +21,8 @@ class CryptoMainFragment : Fragment() {
     private val mBinding get() = _binding!!
 
     private val viewRecipeModel by viewModel<CryptoMainViewModel>()
+
+    private val scopeCrypto = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,6 +40,19 @@ class CryptoMainFragment : Fragment() {
 
             this.adapter = adapter
         }
+
+        scopeCrypto.launch {
+            viewRecipeModel.cryptoLiveData.observe(viewLifecycleOwner) {
+                if (it != null){
+                    bindUI(it)
+                }
+            }
+        }
+    }
+
+    private fun bindUI(crypto: List<CryptoMain>){
+        val adapter = mBinding.recyclerCrypto.adapter as CryptoMainAdapter
+        adapter.submitList(crypto)
     }
 
 

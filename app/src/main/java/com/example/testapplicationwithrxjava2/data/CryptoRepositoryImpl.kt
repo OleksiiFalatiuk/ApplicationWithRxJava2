@@ -7,7 +7,7 @@ import java.util.*
 
 class CryptoRepositoryImpl(private val remote: RemoteDataSource): CryptoRepository {
 
-    override suspend fun loadCrypto(): CryptoMain {
+    override suspend fun loadCrypto(): List<CryptoMain> {
         return remote.loadCrypto()
     }
 }

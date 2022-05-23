@@ -11,9 +11,9 @@ import kotlinx.coroutines.launch
 
 class CryptoMainViewModel(private val repository: CryptoRepository): ViewModel() {
 
-    private val _cryptoLiveData = MutableLiveData<CryptoMain>(null)
+    private val _cryptoLiveData = MutableLiveData<List<CryptoMain>>(null)
 
-    val cryptoLiveData: LiveData<CryptoMain> = _cryptoLiveData
+    val cryptoLiveData: LiveData<List<CryptoMain>> = _cryptoLiveData
 
     init {
         loadCryptoMainInfo()
