@@ -41,13 +41,12 @@ class CryptoMainFragment : Fragment() {
             this.adapter = adapter
         }
 
-        scopeCrypto.launch {
             viewRecipeModel.cryptoLiveData.observe(viewLifecycleOwner) {
                 if (it != null){
                     bindUI(it)
                 }
             }
-        }
+
     }
 
     private fun bindUI(crypto: List<CryptoMain>){

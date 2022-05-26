@@ -2,16 +2,16 @@ package com.example.testapplicationwithrxjava2.data.remote
 
 import com.example.testapplicationwithrxjava2.data.remote.retrofit.CryptoApiService
 import okhttp3.Interceptor
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import java.util.concurrent.TimeUnit
 
-class NetworkModule{
+class NetworkModule {
     private val baseUrl = "https://api.nomics.com/v1/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -28,20 +28,20 @@ class NetworkModule{
         .build()
 
 
-
     private val retrofitBuilder = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(httpClient)
         .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
 
 
     val api: CryptoApiService = retrofitBuilder.create()
 }
 
-class ApiInterceptor: Interceptor {
+class ApiInterceptor : Interceptor {
 
-    companion object{
+    companion object {
         private const val API = "df2434ecdd8d048db5a98c9c9ff6f4e868443e12"
     }
 
