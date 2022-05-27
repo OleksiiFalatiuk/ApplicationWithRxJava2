@@ -13,25 +13,34 @@ import org.koin.dsl.module
 
 val cryptoModule = module {
 
-    factory <CryptoApiService> {
+    factory<CryptoApiService> {
         NetworkModule().api
     }
 
     single<RemoteDataSource> {
+        val api = get<CryptoApiService>()
         RetrofitDataSource(
-            api = get<CryptoApiService>()
+//            api = get<CryptoApiService>()
+            getListApi = api::getCurrenciesTicker,
+            getSingleApi = api::getCurrenciesRxTicker
         )
     }
 
     single<CryptoRepository> {
+        val remote = get<RemoteDataSource>()
         CryptoRepositoryImpl(
-            remote = get<RemoteDataSource>()
+//            remote = get<RemoteDataSource>()
+            getRemote = remote::loadRepeatCryptoRx,
+            getRemoteList = remote::loadCrypto,
+            getRemoteListRx = remote::loadRxCrypto
         )
     }
 
-    viewModel <CryptoMainViewModel> {
+    viewModel<CryptoMainViewModel> {
+        val repository = get<CryptoRepository>()
         CryptoMainViewModel(
-            repository = get<CryptoRepository>()
+//            repository = get<CryptoRepository>()
+            getCrypto = repository::loadRepeatCryptoRx
         )
     }
 

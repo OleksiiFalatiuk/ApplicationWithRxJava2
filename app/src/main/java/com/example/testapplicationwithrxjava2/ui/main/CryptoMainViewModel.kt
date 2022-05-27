@@ -7,13 +7,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.testapplicationwithrxjava2.data.CryptoRepository
 import com.example.testapplicationwithrxjava2.models.CryptoMain
+import com.example.testapplicationwithrxjava2.utils.debugDo
+import com.example.testapplicationwithrxjava2.utils.logError
+import com.example.testapplicationwithrxjava2.utils.logErrorStackTrace
+import com.example.testapplicationwithrxjava2.utils.logInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class CryptoMainViewModel(private val repository: CryptoRepository): ViewModel() {
+class CryptoMainViewModel(
+//    private val repository: CryptoRepository
+    private val getCrypto: () -> Flow<List<CryptoMain>>
+) : ViewModel() {
 
     private val _cryptoLiveData = MutableLiveData<List<CryptoMain>>(null)
 
@@ -22,21 +32,39 @@ class CryptoMainViewModel(private val repository: CryptoRepository): ViewModel()
     private val disposable = CompositeDisposable()
 
     init {
-//        loadCryptoMainInfo()
-        loadRxCrypto()
-        Log.d("checkData", "start")
-    }
+        loadCryptoWithFlowRepeat()
+//        loadRxCrypto()
+//        Log.d("checkData", "start")
+        kotlin.runCatching {
+            10 / 0
+        }.getOrElse {
+            logInfo("error")
+            it.logError()
+            it.logErrorStackTrace()
+            debugDo(false) {
 
-    private fun loadCryptoMainInfo(){
-        viewModelScope.launch {
-            try {
-                _cryptoLiveData.value = repository.loadCrypto()
-            }catch (ex: Exception){
-                ex.printStackTrace()
             }
         }
     }
 
+//    private fun loadCryptoMainInfo() {
+//        viewModelScope.launch {
+//            try {
+//                _cryptoLiveData.value = repository.loadCrypto()
+//            } catch (ex: Exception) {
+//                ex.printStackTrace()
+//            }
+//        }
+//    }
+
+    private fun loadCryptoWithFlowRepeat() {
+        getCrypto.invoke()
+            .onEach {
+                _cryptoLiveData.value = it
+            }
+            .flowOn(Dispatchers.Main)
+            .launchIn(viewModelScope)
+    }
 
 
     override fun onCleared() {
@@ -44,20 +72,20 @@ class CryptoMainViewModel(private val repository: CryptoRepository): ViewModel()
         super.onCleared()
     }
 
-    private fun loadRxCrypto(){
-        val result = repository.loadRxCrypto()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    _cryptoLiveData.value = it
-                    Log.d("checkData", "all is success")
-                },
-                {
-                    Log.d("checkData", it.stackTraceToString())
-                }
-            )
-        disposable.add(result)
-    }
+//    private fun loadRxCrypto() {
+//        val result = repository.loadRxCrypto()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(
+//                {
+//                    _cryptoLiveData.value = it
+//                    Log.d("checkData", "all is success")
+//                },
+//                {
+//                    Log.d("checkData", it.stackTraceToString())
+//                }
+//            )
+//        disposable.add(result)
+//    }
 
 }
