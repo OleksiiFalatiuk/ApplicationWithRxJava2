@@ -8,40 +8,45 @@ import com.example.testapplicationwithrxjava2.data.remote.retrofit.CryptoApiServ
 import com.example.testapplicationwithrxjava2.data.remote.retrofit.RetrofitDataSource
 import com.example.testapplicationwithrxjava2.ui.main.CryptoMainViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.Module
 import org.koin.dsl.module
 
 
-val cryptoModule = module {
+val cryptoModule = mutableListOf<Module>(
+    module {
 
-    factory<CryptoApiService> {
-        NetworkModule().api
-    }
+        factory<CryptoApiService> {
+            NetworkModule().api
+        }
 
-    single<RemoteDataSource> {
-        val api = get<CryptoApiService>()
-        RetrofitDataSource(
+        single<RemoteDataSource> {
+            val api = get<CryptoApiService>()
+            RetrofitDataSource(
 //            api = get<CryptoApiService>()
-            getListApi = api::getCurrenciesTicker,
-            getSingleApi = api::getCurrenciesRxTicker
-        )
-    }
+                getListApi = api::getCurrenciesTicker,
+                getSingleApi = api::getCurrenciesRxTicker
+            )
+        }
 
-    single<CryptoRepository> {
-        val remote = get<RemoteDataSource>()
-        CryptoRepositoryImpl(
+        single<CryptoRepository> {
+            val remote = get<RemoteDataSource>()
+            CryptoRepositoryImpl(
 //            remote = get<RemoteDataSource>()
-            getRemote = remote::loadRepeatCryptoRx,
-            getRemoteList = remote::loadCrypto,
-            getRemoteListRx = remote::loadRxCrypto
-        )
-    }
+                getRemote = remote::loadRepeatCryptoRx,
+                getRemoteList = remote::loadCrypto,
+                getRemoteListRx = remote::loadRxCrypto
+            )
+        }
 
-    viewModel<CryptoMainViewModel> {
-        val repository = get<CryptoRepository>()
-        CryptoMainViewModel(
+        viewModel<CryptoMainViewModel> {
+            val repository = get<CryptoRepository>()
+            CryptoMainViewModel(
 //            repository = get<CryptoRepository>()
-            getCrypto = repository::loadRepeatCryptoRx
-        )
-    }
+                getCrypto = repository::loadRepeatCryptoRx,
+                getCryptoCoroutines = repository::loadCrypto
+            )
+        }
 
-}
+    }
+)
+

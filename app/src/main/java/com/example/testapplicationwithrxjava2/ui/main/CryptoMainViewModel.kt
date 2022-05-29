@@ -22,7 +22,8 @@ import kotlinx.coroutines.withContext
 
 class CryptoMainViewModel(
 //    private val repository: CryptoRepository
-    private val getCrypto: () -> Flow<List<CryptoMain>>
+    private val getCrypto: () -> Flow<List<CryptoMain>>,
+    private val getCryptoCoroutines: suspend () -> List<CryptoMain>
 ) : ViewModel() {
 
     private val _cryptoLiveData = MutableLiveData<List<CryptoMain>>(null)
@@ -47,15 +48,16 @@ class CryptoMainViewModel(
         }
     }
 
-//    private fun loadCryptoMainInfo() {
-//        viewModelScope.launch {
-//            try {
-//                _cryptoLiveData.value = repository.loadCrypto()
-//            } catch (ex: Exception) {
-//                ex.printStackTrace()
-//            }
-//        }
-//    }
+    fun loadCryptoMainInfo() {
+        viewModelScope.launch {
+            try {
+                _cryptoLiveData.value = getCryptoCoroutines.invoke()
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                _cryptoLiveData.value = emptyList()
+            }
+        }
+    }
 
     private fun loadCryptoWithFlowRepeat() {
         getCrypto.invoke()
